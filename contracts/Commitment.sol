@@ -13,7 +13,6 @@ contract Commitment is Ownable {
     }
 
     uint goal;
-    // Can this date be smaller size?
     uint64 deadline;
     address payable recipient;
     SaveMoneyData data;
@@ -27,7 +26,7 @@ contract Commitment is Ownable {
      }
 
      modifier isTime() {
-        require(block.timestamp >= deadline, "It is not yet the commitment deadline.");
+        require(block.timestamp < deadline, "It is not yet the commitment deadline.");
         _;
      }
 
