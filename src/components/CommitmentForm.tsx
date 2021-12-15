@@ -15,6 +15,8 @@ export default function CommitementForm() {
         console.log(data)
     }
 
+    // Set this up so users can set a goal to save/earn money
+
     return (
         <form onSubmit={handleSubmit(onSubmit)}>
             <FormControl isInvalid={errors.name}>
