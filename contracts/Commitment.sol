@@ -26,9 +26,15 @@ contract Commitment is Ownable {
      }
 
      modifier isTime() {
-        require(block.timestamp < deadline, "It is not yet the commitment deadline.");
+        require(block.timestamp > deadline, "It is not yet the commitment deadline.");
         _;
      }
+
+     event Transfer(
+         address _from,
+         address _to,
+         uint _value
+     );
 
      function didSaveMoney() internal view returns (bool) {
         return owner().balance >= (data.startingAmount + data.amountToSave);
@@ -49,7 +55,10 @@ contract Commitment is Ownable {
             uint amount = address(this).balance;
             uint cut = amount * 375 / 10000;
             recipient.transfer(amount - cut);
-            payable(0x058243BD7F888cBcff798df3Fa4c7BFc7a1f86a7).transfer(cut);
+            // This should be mainnet address when deploying
+            address payable owner = payable(0xdF3e18d64BC6A983f673Ab319CCaE4f1a57C7097);
+            owner.transfer(cut);
+            emit Transfer(address(this), owner, cut);
         }
      }
 
