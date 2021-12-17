@@ -32,7 +32,12 @@ module.exports = {
   },
   defaultNetwork: "localhost",
   networks: {
+    localhost: {
+      url: "http://localhost:8545",
+      chainId: 1337
+    },
     hardhat: { 
+      chainId: 1337
     },
     mumbai: {
       url: "https://rpc-mumbai.maticvigil.com",
