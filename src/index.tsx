@@ -6,7 +6,7 @@ import { DAppProvider } from "@usedapp/core";
 
 ReactDOM.render(
   <React.StrictMode>
-    <DAppProvider config={{}}>
+    <DAppProvider config={{supportedChains: [1337, 1, 3]}}>
       <App />
     </DAppProvider>
   </React.StrictMode>,
