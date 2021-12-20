@@ -1,4 +1,4 @@
-import { useEthers, useEtherBalance } from "@usedapp/core"
+import { useEthers } from "@usedapp/core"
 import CommitementForm from "./CommitmentForm"
 import { Text, Button } from '@chakra-ui/react'
 
@@ -11,10 +11,11 @@ export default function Homepage() {
     }
 
     let component
+    console.log("error", error)
     if (error) {
         component = (
             <div>
-                <Text color="white">We do not support any chain other than Ethereum at the moment</Text>
+				{error.name === "NoEthereumProviderError" ? <Text color="white">Please authorize your wallet on this page</Text> : <Text color="white">We do not support any chain other than Ethereum at the moment</Text>}
                 <Button onClick={connectWallet}>Connect wallet</Button>
             </div>
 
