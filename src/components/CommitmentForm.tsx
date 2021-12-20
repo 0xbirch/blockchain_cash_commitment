@@ -6,15 +6,15 @@ import 'react-datepicker/dist/react-datepicker-cssmodules.css';
 import "react-datepicker/dist/react-datepicker.css";
 import { useEtherBalance } from "@usedapp/core"
 import { formatEther } from '@ethersproject/units'
+import { useCommitmentEvaluate } from "../hooks/contracts/useCommitmentEvaluate";
 
 export default function CommitementForm(props: any) {
 
     const { register, control, handleSubmit, formState: { errors } } = useForm();
     const [startDate, setStartDate] = useState(new Date())
     const [recipient, setRecipient] = useState("1")
-    console.log("props account", props.account)
     let etherBalance = useEtherBalance(props.account)
-    console.log("Balance:", etherBalance)
+    useCommitmentEvaluate()
 
     function onSubmit(data: any) {
         console.log(data)
