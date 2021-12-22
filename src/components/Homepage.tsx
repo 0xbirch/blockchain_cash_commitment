@@ -4,14 +4,12 @@ import { Text, Button } from '@chakra-ui/react'
 
 export default function Homepage() {
     const {activateBrowserWallet, account, error} = useEthers()
-    console.log("account =", account)
 
     function connectWallet() {
         activateBrowserWallet()
     }
 
     let component
-    console.log("error", error)
     if (error) {
         component = (
             <div>
