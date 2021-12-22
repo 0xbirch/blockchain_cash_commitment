@@ -1,33 +1,48 @@
 import React, { useState } from "react";
-import { Controller, useForm } from "react-hook-form";
-import { Box, Text, FormControl, Select, FormLabel, FormErrorMessage, Button, InputGroup, InputRightAddon, Stack, NumberInput, NumberInputField, RadioGroup, Radio } from "@chakra-ui/react";
+import { useForm } from "react-hook-form";
+import { Alert, AlertIcon, AlertTitle, AlertDescription, CloseButton, Box, Text, FormControl, Select, FormLabel, FormErrorMessage, Button, InputGroup, InputRightAddon, Stack, NumberInput, NumberInputField, RadioGroup, Radio } from "@chakra-ui/react";
 import DatePicker from "react-datepicker"
 import 'react-datepicker/dist/react-datepicker-cssmodules.css';
 import "react-datepicker/dist/react-datepicker.css";
-import { useEtherBalance } from "@usedapp/core"
+import { useContractFunction, useEtherBalance, TransactionState, getStoredTransactionState } from "@usedapp/core"
 import { formatEther } from '@ethersproject/units'
-import { useCommitmentEvaluate } from "../hooks/contracts/useCommitmentEvaluate";
+import { ethers } from "ethers"
+import Commitment from "../abi/Commitment.json"
 
 export default function CommitementForm(props: any) {
 
-    const { register, control, handleSubmit, formState: { errors } } = useForm();
+    const { register, setValue, handleSubmit, formState: { errors } } = useForm();
     const [startDate, setStartDate] = useState(new Date())
     const [recipient, setRecipient] = useState("1")
     let etherBalance = useEtherBalance(props.account)
-    useCommitmentEvaluate()
 
+    const deployContract = async (data: any) => {
+	//	const newContract = new ethers.ContractFactory(Commitment.abi, Commitment.bytecode)
+		console.log(data)
+	//	newContract.deploy(data.goal, data.)
+    }
+	
+
+    let alert = <h1>This is where an alert would go</h1>
     function onSubmit(data: any) {
-        console.log(data)
+        deployContract(data)
+        alert = (
+            <Alert status="success">
+                <AlertIcon />
+                <AlertTitle mr={2}>Title goes here man</AlertTitle>
+                <CloseButton position='absolute' right='8px' top='8px' />
+            </Alert>
+        )
     }
 
     return (
         <div>
             <Box>
                 <Text color="white" fontSize="md">
-                   Account: {props.account}
+                    Account: {props.account}
                 </Text>
                 <Text color="white" fontSize="md">
-                   Balance: {etherBalance ? formatEther(etherBalance) : 0} ETH
+                    Balance: {etherBalance ? formatEther(etherBalance) : 0} ETH
                 </Text>
             </Box>
             <form onSubmit={handleSubmit(onSubmit)}>
@@ -39,13 +54,10 @@ export default function CommitementForm(props: any) {
                         })} value='0'>Save or Make Money</option>
                     </Select>
                     <FormLabel pt={10} htmlFor="timeframe" color="white">When do you want to accomplish your goal by?</FormLabel>
-                    <Controller
-                        control={control}
-                        name='date-input'
-                        render={({ field }) => (
-                            <DatePicker selected={startDate} onChange={(date: any) => setStartDate(date)} />
-                        )}
-                    />
+                            <DatePicker {...register('deadline', { value: startDate})} selected={startDate} onChange={(date: any) => {
+								setValue("deadline", date)
+								return setStartDate(date)
+							}} />
                     <FormLabel pt={10} htmlFor="amountStaked" color="white">How much do you want to stake?</FormLabel>
                     <InputGroup>
                         <NumberInput defaultValue={1.0} precision={10} max={10000} min={0.0000000001}>
@@ -74,6 +86,7 @@ export default function CommitementForm(props: any) {
                     Submit
                 </Button>
             </form>
+            {alert && alert} 
         </div>
     )
 }
