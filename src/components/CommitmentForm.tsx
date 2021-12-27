@@ -15,10 +15,11 @@ export default function CommitementForm(props: any) {
     const [startDate, setStartDate] = useState(new Date())
     const [recipient, setRecipient] = useState("1")
 	let etherBalance = useEtherBalance(props.account)
+	const provider = props.provider
 
     const deployContract = async (goal: number, deadline: number, beneficiary: string | undefined, amountStaked: number, amountToSave: number) => {
 		console.log(goal, deadline, beneficiary, amountStaked, amountToSave)
-		const newContract = new ethers.ContractFactory(Commitment.abi, Commitment.bytecode)
+		const newContract = new ethers.ContractFactory(Commitment.abi, Commitment.bytecode, provider.getSigner())
 		debugger
 		try {
 			await newContract.deploy(goal, deadline, beneficiary, amountToSave, {value: amountStaked})
