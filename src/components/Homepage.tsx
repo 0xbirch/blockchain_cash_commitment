@@ -3,15 +3,13 @@ import CommitementForm from "./CommitmentForm"
 import { Text, Button } from '@chakra-ui/react'
 
 export default function Homepage() {
-    const {activateBrowserWallet, account, error} = useEthers()
-    console.log("account =", account)
+    const {library, activateBrowserWallet, account, error} = useEthers()
 
     function connectWallet() {
         activateBrowserWallet()
     }
 
     let component
-    console.log("error", error)
     if (error) {
         component = (
             <div>
@@ -23,7 +21,7 @@ export default function Homepage() {
     } else if (!account) {
         component = <Button onClick={connectWallet}>Connect wallet</Button>
     } else {
-        component = <CommitementForm account={account}/> 
+        component = <CommitementForm account={account} provider={library}/> 
     }
 
     return component

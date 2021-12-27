@@ -10,12 +10,9 @@ task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
 
   for (const account of accounts) {
     const balance = await account.getBalance()
-    console.log(account.address, ":", hre.ethers.utils.formatEther(balance.toString()), "ether");
+    console.log(account.address, ":", hre.ethers.utils.formatEther(balance.toString()), "ether", "nonce", await account.getTransactionCount());
   }
 });
-
-// You need to export an object to set up your config
-// Go to https://hardhat.org/config/ to learn more
 
 /**
  * @type import('hardhat/config').HardhatUserConfig
@@ -23,6 +20,9 @@ task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
 module.exports = {
   solidity: {
     version: "0.8.4",
+	paths: {
+    	artifacts: './src/artifacts',
+  	},
     settings: {
       optimizer: {
         enabled: true,
