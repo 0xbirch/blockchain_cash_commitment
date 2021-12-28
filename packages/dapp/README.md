@@ -7,3 +7,13 @@ Recipent options for where your money should go should you not complete your goa
      - Because then user's would never complete their goals as buying crypto is usually something people would like to do more of 
 2. Could go to seperate blockchain projects as donations 
 3. If we can find public addresses of PACs or other anti-charities we could do that as well
+
+Scheduler
+	Can we deploy a lambda that runs on a schedule?
+		This probably isnt the fastest way to get something deployed there must be something more simplet
+
+	Run your own API on EC2 that manges all the jobs?
+		expensive
+
+	Run a server locally
+		This would be pretty unreliable 

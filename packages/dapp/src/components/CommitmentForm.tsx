@@ -11,16 +11,16 @@ import Commitment from "../abi/Commitment.json"
 
 export default function CommitementForm(props: any) {
 
-    const { register, setValue, handleSubmit, formState: { errors } } = useForm();
+    const { watch, register, setValue, handleSubmit, formState: { errors } } = useForm();
     const [startDate, setStartDate] = useState(new Date())
     const [recipient, setRecipient] = useState("1")
 	let etherBalance = useEtherBalance(props.account)
 	const provider = props.provider
-
+	const watchGoal = watch('goal')
+	
     const deployContract = async (goal: number, deadline: number, beneficiary: string | undefined, amountStaked: number, amountToSave: number) => {
 		console.log(goal, deadline, beneficiary, amountStaked, amountToSave)
 		const newContract = new ethers.ContractFactory(Commitment.abi, Commitment.bytecode, provider.getSigner())
-		debugger
 		try {
 			await newContract.deploy(goal, deadline, beneficiary, amountToSave, {value: amountStaked})
 		} catch(error) {
@@ -41,7 +41,7 @@ export default function CommitementForm(props: any) {
 
 		data.amountStaked = ethers.utils.parseEther(data.amountStaked)
 		data.amountSaved = ethers.utils.parseEther(data.amountSaved)
-        deployContract(data.goal, data.deadline.getTime(), beneficiaryMapping.get(data.recipient), data.amountStaked, data.amountSaved)
+        // deployContract(data.goal, data.deadline.getTime(), beneficiaryMapping.get(data.recipient), data.amountStaked, data.amountSaved)
         alert = (
             <Alert status="success">
                 <AlertIcon />
@@ -82,12 +82,11 @@ export default function CommitementForm(props: any) {
             <form onSubmit={handleSubmit(onSubmit)}>
                 <FormControl isInvalid={errors.name}>
                     <FormLabel pt={10} htmlFor="goal" color="white">What is your goal?</FormLabel>
-                    <Select color="white" placeholder='Select option' id="goal">
-                        <option {...register("goal", {
-                            required: "This is required"
-                        })} value='0'>Save or Make Money</option>
+                    <Select {...register("goal", {required: "This is required"})} color="white" placeholder='Select option' id="goal">
+                        <option value='0'>Save or Make Money</option>
+						<option value='1'>Another Goal</option>
                     </Select>
-					{true && amountToSaveComponent}
+					{watchGoal === '0' && amountToSaveComponent}
                     <FormLabel pt={10} htmlFor="timeframe" color="white">When do you want to accomplish your goal by?</FormLabel>
                             <DatePicker {...register('deadline', { value: startDate})} selected={startDate} onChange={(date: any) => {
 								setValue("deadline", date)
@@ -109,8 +108,11 @@ export default function CommitementForm(props: any) {
                     <FormLabel pt={10} htmlFor="recipient" color="white">Who do you want your stake to go to if you don't meet your goal?</FormLabel>
                     <RadioGroup onChange={setRecipient} value={recipient}>
                         <Stack>
-                            <Radio {...register("recipient")} value="0" color="white">Trump</Radio>
-                            <Radio {...register("recipient")} value="1" color="white">Biden</Radio>
+                            <Radio {...register("recipient")} value="0" colorScheme="white"><Text color="white">Test Account 1</Text></Radio>
+                            <Radio {...register("recipient")} value="1" color="white"><Text color="white">Test Account 2</Text></Radio>
+                            <Radio {...register("recipient")} value="2" color="white"><Text color="white">Test Account 3</Text></Radio>
+                            <Radio {...register("recipient")} value="3" color="white"><Text color="white">Test Account 4</Text></Radio>
+                            <Radio {...register("recipient")} value="4" color="white"><Text color="white">Test Account 5</Text></Radio>
                         </Stack>
                     </RadioGroup>
                     <FormErrorMessage>
