@@ -19,7 +19,7 @@ contract Commitment is Ownable, KeeperCompatibleInterface {
     uint64 deadline;
     address payable recipient;
     SaveMoneyData data;
-    
+
      constructor(uint8 commitmentGoal, uint64 date, address payable receiver, uint amountToSave) payable {
          goal = commitmentGoal;
          deadline = date;

@@ -43,7 +43,6 @@
     ]
   },
   "devDependencies": {
-    "@types/react-datepicker": "^4.1.7",
-    "chai": "^4.3.4"
+    "@types/react-datepicker": "^4.1.7"
   }
 }
