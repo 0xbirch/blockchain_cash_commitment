@@ -2,8 +2,9 @@
 pragma solidity ^0.8.0;
 
 import "./Commitment.sol";
+import "@chainlink/contracts/src/v0.8/KeeperCompatible.sol";
 
-contract CommitmentCore {
+contract CommitmentCore is KeeperCompatibleInterface {
 
 	event CommitmentContractCreated(address indexed owner, address contractAddress);
 	mapping(address => address) public commitments;
@@ -20,6 +21,14 @@ contract CommitmentCore {
 			commitments[msg.sender] = commitmentAddress; 
 			emit CommitmentContractCreated(msg.sender, commitmentAddress);
 	}	
+	
+	function checkUpkeep(bytes calldata checkdata) external override view returns (bool, bytes memory) {
+			
+	}
+
+	function performUpkeep(bytes calldata performData) external override {
+			
+	}
 
 	receive() external payable {}
 }
