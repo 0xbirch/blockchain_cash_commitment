@@ -1,5 +1,6 @@
 const { expect } = require("chai");
 const { ethers } = require("hardhat");
+require("hardhat");
 const assert = require("assert")
 describe("CommittmentCore tests", function () {
 
@@ -41,5 +42,18 @@ describe("CommittmentCore tests", function () {
 			{value: ethers.utils.parseEther("2")})
 		const events = await commitmentContract.queryFilter("CommitmentContractCreated")
 		assert(events[0].args[1] === await commitmentContract.commitments("0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266"))
+	})	
+
+	it.only("Should validate that check up keep should return false if there are no commitments to execute", async () => {
+		const date = new Date()
+        const goalDate = Math.round(date.setDate(date.getDate() + 1) / 1000)
+		await commitmentContract.newCommitment(0, 
+			goalDate,
+			"0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266", 
+			ethers.utils.parseEther("1"), 
+			{value: ethers.utils.parseEther("2")})
+		const data = "0x00";
+		const returns = await commitmentContract.checkUpkeep(data)
+		assert.deepEqual(returns, [false, '0x'])
 	})	
 })
