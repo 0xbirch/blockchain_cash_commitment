@@ -3,11 +3,16 @@ pragma solidity ^0.8.0;
 
 
 import "@openzeppelin/contracts/access/Ownable.sol";
-import "hardhat/console.sol";
-import "@chainlink/contracts/src/v0.8/KeeperCompatible.sol";
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 
-contract Commitment is Ownable, KeeperCompatibleInterface {
+/* interface ICommitment {
+	function getRecipient() internal view returns (address);
+	function isTimeToEvaluate() internal view returns (bool);
+	function didAccomplishGoal() internal view returns (bool);
+	function calculateOwnerFee() internal view returns (uint);
+}
+*/
+contract Commitment is Ownable {
 	using SafeMath for uint;    
 
     struct SaveMoneyData {
@@ -27,10 +32,26 @@ contract Commitment is Ownable, KeeperCompatibleInterface {
          data = SaveMoneyData(msg.sender.balance, amountToSave);
      }
 
-     function checkUpkeep(bytes calldata /*checkData*/) external override view returns (bool, bytes memory) {
+	 function isTimeToEvaluate() public view returns (bool) {
         if (block.timestamp < deadline) {
-				return (false, bytes(""));
+			return false;
+		} else {
+			return true;
 		}
+		 
+	 }
+
+	 function didAccomplishGoal() public view returns (bool) {
+		 
+	 }
+	 function getRecipient() public view returns (address) {
+		 
+	 }
+	 function calculateOwnerFee() public view returns (uint) {
+		 
+	 }
+
+/*     function checkUpkeep(bytes calldata checkData) external override view returns (bool, bytes memory) {
 
 		if (goal == 0) {
 			address payable localRecipient;
@@ -62,7 +83,8 @@ contract Commitment is Ownable, KeeperCompatibleInterface {
 		if (cut > 0) {
 			payable(0x9eE843fefFc921763025221f88e65C85de69ec11).transfer(cut);
 		}
-	}
-
+	} 
+	
+*/
      
 }
