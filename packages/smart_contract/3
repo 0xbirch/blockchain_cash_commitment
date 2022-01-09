@@ -42,10 +42,13 @@ contract Commitment is Ownable {
 	 }
 
 	 function didAccomplishGoal() public view returns (bool) {
-		return false; 
+		return true;		 
 	 }
 	 function getRecipient() public view returns (address) {
 		return recipient;	 
+	 }
+	 function calculateOwnerFee() public view returns (uint) {
+		 
 	 }
 
 /*     function checkUpkeep(bytes calldata checkData) external override view returns (bool, bytes memory) {
