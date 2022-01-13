@@ -32,7 +32,7 @@ contract Commitment is Ownable {
          data = SaveMoneyData(msg.sender.balance, amountToSave);
      }
 
-	 function isTimeToEvaluate() public view returns (bool) {
+	 function isTimeToEvaluate() public view onlyOwner returns (bool) {
         if (block.timestamp < deadline) {
 			return false;
 		} else {
@@ -41,12 +41,16 @@ contract Commitment is Ownable {
 		 
 	 }
 
-	 function didAccomplishGoal() public view returns (bool) {
+	 function didAccomplishGoal() public view onlyOwner returns (bool) {
 		return false; 
 	 }
-	 function getRecipient() public view returns (address) {
+	 function getRecipient() public view onlyOwner returns (address payable) {
 		return recipient;	 
 	 }
+
+	function executePayout(address payable to, uint amount) public onlyOwner {
+			to.transfer(amount);
+	}	
 
 /*     function checkUpkeep(bytes calldata checkData) external override view returns (bool, bytes memory) {
 
