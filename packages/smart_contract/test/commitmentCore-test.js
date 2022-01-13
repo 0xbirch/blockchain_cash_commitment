@@ -7,6 +7,7 @@ describe("CommittmentCore tests", function () {
 	let commitmentContract
 
 	beforeEach("set up commitmentCore contract", async () => {
+		await ethers.provider.send("hardhat_reset", []);
 		const CommitmentCore = await ethers.getContractFactory("CommitmentCore")
 		commitmentContract = await CommitmentCore.deploy()
 		await commitmentContract.deployed()
@@ -78,6 +79,12 @@ describe("CommittmentCore tests", function () {
 			"0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266", 
 			ethers.utils.parseEther("1"), 
 			{value: ethers.utils.parseEther("2")})
+		const tx = {
+		to: "0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266",
+		value: ethers.utils.parseEther("2"),
+		}	
+		const zaddy = commitmentContract.provider.getSigner("0xdD2FD4581271e230360230F9337D5c0430Bf44C0")
+		await zaddy.sendTransaction(tx)
 		const data = "0x00";
 		const returns = await commitmentContract.checkUpkeep(data)
 		assert(returns[1].includes("f39fd6e51aad88f6f4ce6ab8827279cfffb92266")) 
@@ -102,6 +109,17 @@ describe("CommittmentCore tests", function () {
 			"0x3c44cdddb6a900fa2b585dd299e03d12fa4293bc", 
 			ethers.utils.parseEther("1"), 
 			{value: ethers.utils.parseEther("1")})
+		const tx = {
+		to: "0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266",
+		value: ethers.utils.parseEther("2"),
+		}	
+		const zaddy = commitmentContract.provider.getSigner("0xdD2FD4581271e230360230F9337D5c0430Bf44C0")
+		await zaddy.sendTransaction(tx)
+		const tx2 = {
+		to: "0x70997970c51812dc3a010c7d01b50e0d17dc79c8",
+		value: ethers.utils.parseEther("2"),
+		}	
+		await zaddy.sendTransaction(tx2)
 		const data2 = "0x00";
 		const returns = await commitmentContract.checkUpkeep(data2)
 		assert(returns[1].includes("f39fd6e51aad88f6f4ce6ab8827279cfffb92266")) 
@@ -148,6 +166,7 @@ describe("CommittmentCore tests", function () {
 		const endingBalanceMainAccount = await ethers.provider.getBalance("0x8626f6940E2eb28930eFb4CeF49B2d1F2C9C1199")
 		const expectedCut = ethers.utils.parseEther("2").mul(ethers.utils.parseEther("375")).div(ethers.utils.parseEther("10000"))
 		const expectedValue = ethers.utils.parseEther("10000").add(ethers.utils.parseEther("2")).sub(expectedCut)
+		console.log("ending balance", endingBalance.toString(), "expexted balance", expectedValue.toString())
 		assert(endingBalance.toString() === expectedValue.toString())
 		assert(endingBalanceMainAccount.toString() === ethers.utils.parseEther("10000").add(expectedCut).toString())
 	})	
@@ -160,6 +179,12 @@ describe("CommittmentCore tests", function () {
 			"0x70997970c51812dc3a010c7d01b50e0d17dc79c8", 
 			ethers.utils.parseEther("1"), 
 			{value: ethers.utils.parseEther("2")})
+		const tx = {
+		to: "0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266",
+		value: ethers.utils.parseEther("2"),
+		}	
+		const newSigner = commitmentContract.provider.getSigner("0x8626f6940E2eb28930eFb4CeF49B2d1F2C9C1199")
+		await newSigner.sendTransaction(tx)
 		const data = "0x00";
 		const returns = await commitmentContract.checkUpkeep(data)
 		await commitmentContract.performUpkeep(returns[1]);	
@@ -186,6 +211,17 @@ describe("CommittmentCore tests", function () {
 			"0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC", 
 			ethers.utils.parseEther("1"), 
 			{value: ethers.utils.parseEther("2")})
+		const tx = {
+		to: "0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266",
+		value: ethers.utils.parseEther("2"),
+		}	
+		const zaddy = commitmentContract.provider.getSigner("0xdD2FD4581271e230360230F9337D5c0430Bf44C0")
+		await zaddy.sendTransaction(tx)
+		const tx2 = {
+		to: "0x8626f6940E2eb28930eFb4CeF49B2d1F2C9C1199",
+		value: ethers.utils.parseEther("2"),
+		}	
+		await zaddy.sendTransaction(tx2)
 		const data = "0x00";
 		const returns = await commitmentContract.checkUpkeep(data)
 		await commitmentContract.performUpkeep(returns[1]);	
@@ -195,7 +231,7 @@ describe("CommittmentCore tests", function () {
 
 	})	
 
-	it.only("performUpkeep should pay multiple recipients and the fee when goals has failed", async () => {
+	it("performUpkeep should pay multiple recipients and the fee when goals has failed", async () => {
 		// This tests needs to have didAccomplishGoal to return false
 		const date = new Date()
         const goalDate = Math.round(date.setDate(date.getDate() - 1) / 1000)

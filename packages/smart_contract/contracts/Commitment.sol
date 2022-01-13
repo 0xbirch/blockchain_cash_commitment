@@ -23,26 +23,27 @@ contract Commitment is Ownable {
     uint8 goal;
     uint64 deadline;
     address payable recipient;
+		address payable commiter;
     SaveMoneyData data;
 
-     constructor(uint8 commitmentGoal, uint64 date, address payable receiver, uint amountToSave) payable {
+     constructor(uint8 commitmentGoal, uint64 date, address payable receiver, address payable originalCommiter, uint amountToSave) payable {
          goal = commitmentGoal;
          deadline = date;
          recipient = receiver;
-         data = SaveMoneyData(msg.sender.balance, amountToSave);
+				 commiter = originalCommiter;
+         data = SaveMoneyData(originalCommiter.balance, amountToSave);
      }
 
 	 function isTimeToEvaluate() public view onlyOwner returns (bool) {
         if (block.timestamp < deadline) {
-			return false;
-		} else {
-			return true;
-		}
-		 
+					return false;
+				} else {
+					return true;
+				}
 	 }
 
 	 function didAccomplishGoal() public view onlyOwner returns (bool) {
-		return false; 
+		return commiter.balance >= (data.startingAmount.add(data.amountToSave)); 
 	 }
 	 function getRecipient() public view onlyOwner returns (address payable) {
 		return recipient;	 

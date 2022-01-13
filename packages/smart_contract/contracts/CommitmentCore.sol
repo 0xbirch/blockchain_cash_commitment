@@ -22,9 +22,9 @@ contract CommitmentCore is KeeperCompatibleInterface {
 	}
 	
 	function newCommitment(uint8 goal, uint64 date, address payable recipient, uint amountToSave) validateParams(goal, date, recipient, amountToSave) external payable {
-			Commitment commitmentContract = new Commitment{value: msg.value}(goal, date, recipient, amountToSave); 
+			Commitment commitmentContract = new Commitment{value: msg.value}(goal, date, recipient, payable(msg.sender), amountToSave); 
 			address commitmentAddress = address(commitmentContract);
-			eoaToContractAddressCommitments.set(uint256(uint160(msg.sender)), commitmentAddress);
+			eoaToContractAddressCommitments.set(convertToUint(msg.sender), commitmentAddress);
 			emit CommitmentContractCreated(msg.sender, commitmentAddress);
 	}	
 	
