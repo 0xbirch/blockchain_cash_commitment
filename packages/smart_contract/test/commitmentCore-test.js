@@ -1,7 +1,7 @@
 const { expect } = require("chai");
-const { ethers } = require("hardhat");
-require("hardhat");
-const assert = require("assert")
+const assert = require("assert");
+const exp = require("constants");
+
 describe("CommittmentCore tests", function () {
 
 	let commitmentContract
@@ -20,7 +20,7 @@ describe("CommittmentCore tests", function () {
 			ethers.utils.parseEther("1"), 
 			{value: ethers.utils.parseEther("2")})
 		} catch (error) {
-			assert(error.message === "Error: VM Exception while processing transaction: reverted with reason string 'Come on now, we don't want to see your ETH burned. Recipient is set to the zero address'")
+			assert(error.message === "VM Exception while processing transaction: reverted with reason string 'Come on now, we don't want to see your ETH burned. Recipient is set to the zero address'")
 		}
 	})	
 
@@ -133,7 +133,7 @@ describe("CommittmentCore tests", function () {
 
 	})	
 
-	it.only("performUpkeep should pay the address that needs to be paid the right amount no fee", async () => {
+	it("performUpkeep should pay the recipient and the fee when goal has failed", async () => {
 		const date = new Date()
         const goalDate = Math.round(date.setDate(date.getDate() - 1) / 1000)
 		await commitmentContract.newCommitment(0, 
@@ -141,17 +141,86 @@ describe("CommittmentCore tests", function () {
 			"0x70997970c51812dc3a010c7d01b50e0d17dc79c8", 
 			ethers.utils.parseEther("1"), 
 			{value: ethers.utils.parseEther("2")})
-		const beginningBalance = ethers.getDefaultProvider().getBalance("0x70997970c51812dc3a010c7d01b50e0d17dc79c8")
 		const data = "0x00";
 		const returns = await commitmentContract.checkUpkeep(data)
-//		console.log(returns[1])
 		await commitmentContract.performUpkeep(returns[1]);	
-		const endingBalance = ethers.getDefaultProvider().getBalance("0x70997970c51812dc3a010c7d01b50e0d17dc79c8")
-		assert(endingBalance.sub(beginningBalance) === ethers.utils.parseEther("2"))
+		const endingBalance = await ethers.provider.getBalance("0x70997970c51812dc3a010c7d01b50e0d17dc79c8")
+		const endingBalanceMainAccount = await ethers.provider.getBalance("0x8626f6940E2eb28930eFb4CeF49B2d1F2C9C1199")
+		const expectedCut = ethers.utils.parseEther("2").mul(ethers.utils.parseEther("375")).div(ethers.utils.parseEther("10000"))
+		const expectedValue = ethers.utils.parseEther("10000").add(ethers.utils.parseEther("2")).sub(expectedCut)
+		assert(endingBalance.toString() === expectedValue.toString())
+		assert(endingBalanceMainAccount.toString() === ethers.utils.parseEther("10000").add(expectedCut).toString())
 	})	
-	it("performUpkeep should pay the address that needs to be paid the right amount with fee", async () => {
+
+	it("performUpkeep should send the money back to the original owner when goal was accomplished", async () => {
+		const date = new Date()
+        const goalDate = Math.round(date.setDate(date.getDate() - 1) / 1000)
+		await commitmentContract.newCommitment(0, 
+			goalDate,
+			"0x70997970c51812dc3a010c7d01b50e0d17dc79c8", 
+			ethers.utils.parseEther("1"), 
+			{value: ethers.utils.parseEther("2")})
+		const data = "0x00";
+		const returns = await commitmentContract.checkUpkeep(data)
+		await commitmentContract.performUpkeep(returns[1]);	
+		const endingBalance = await ethers.provider.getBalance("0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266")
+		const endingBalanceRecipient = await ethers.provider.getBalance("0x70997970c51812dc3a010c7d01b50e0d17dc79c8")
+		const expectedValue = ethers.utils.parseEther("10000")
+		assert(endingBalance.toString() > expectedValue.toString())
+		assert(endingBalanceRecipient.toString() === expectedValue.toString())
 	})	
-	it("performUpkeep should pay the addresses that needs to be paid the right amount with fee", async () => {
+
+	it("performUpkeep should pay the mulitiple addresses that needs to be paid", async () => {
+		// This tests needs to have didAccomplishGoal to return true 
+		const date = new Date()
+        const goalDate = Math.round(date.setDate(date.getDate() - 1) / 1000)
+		await commitmentContract.newCommitment(0, 
+			goalDate,
+			"0x70997970c51812dc3a010c7d01b50e0d17dc79c8", 
+			ethers.utils.parseEther("1"), 
+			{value: ethers.utils.parseEther("2")})
+		const newSigner = commitmentContract.provider.getSigner("0x8626f6940E2eb28930eFb4CeF49B2d1F2C9C1199")
+		const newContract = commitmentContract.connect(newSigner)
+		await newContract.newCommitment(0, 
+			goalDate,
+			"0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC", 
+			ethers.utils.parseEther("1"), 
+			{value: ethers.utils.parseEther("2")})
+		const data = "0x00";
+		const returns = await commitmentContract.checkUpkeep(data)
+		await commitmentContract.performUpkeep(returns[1]);	
+		const endingBalance = await ethers.provider.getBalance("0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266")
+		const expectedValue = ethers.utils.parseEther("9997")
+		assert(parseInt(endingBalance.toString()) > parseInt(expectedValue.toString()))
+
+	})	
+
+	it.only("performUpkeep should pay multiple recipients and the fee when goals has failed", async () => {
+		// This tests needs to have didAccomplishGoal to return false
+		const date = new Date()
+        const goalDate = Math.round(date.setDate(date.getDate() - 1) / 1000)
+		await commitmentContract.newCommitment(0, 
+			goalDate,
+			"0x70997970c51812dc3a010c7d01b50e0d17dc79c8", 
+			ethers.utils.parseEther("1"), 
+			{value: ethers.utils.parseEther("2")})
+		const newSigner = commitmentContract.provider.getSigner("0x90F79bf6EB2c4f870365E785982E1f101E93b906")
+		const newContract = commitmentContract.connect(newSigner)
+		await newContract.newCommitment(0, 
+			goalDate,
+			"0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC", 
+			ethers.utils.parseEther("1"), 
+			{value: ethers.utils.parseEther("2")})
+		const data = "0x00";
+		const returns = await commitmentContract.checkUpkeep(data)
+		await commitmentContract.performUpkeep(returns[1]);	
+		const endingBalance = await ethers.provider.getBalance("0x70997970c51812dc3a010c7d01b50e0d17dc79c8")
+		const endingBalanceMainAccount = await ethers.provider.getBalance("0x8626f6940E2eb28930eFb4CeF49B2d1F2C9C1199")
+		const expectedCut = ethers.utils.parseEther("2").mul(ethers.utils.parseEther("375")).div(ethers.utils.parseEther("10000"))
+		const expectedValue = ethers.utils.parseEther("10000").add(ethers.utils.parseEther("2")).sub(expectedCut)
+		console.log("Ending balance of the first recipient", ethers.utils.formatEther(endingBalance.toString()))
+		assert(endingBalance.toString() === expectedValue.toString())
+		assert(endingBalanceMainAccount.toString() === ethers.utils.parseEther("10000").add(expectedCut).add(expectedCut).toString())
 	})	
 
 

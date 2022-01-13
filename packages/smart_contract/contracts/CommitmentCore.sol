@@ -17,9 +17,10 @@ contract CommitmentCore is KeeperCompatibleInterface {
 	modifier validateParams(uint8 goal, uint64 date, address payable recipient, uint amountToSave) {
 		// Validate other params here	
 		require(recipient != address(0), "Come on now, we don't want to see your ETH burned. Recipient is set to the zero address");
+		require(eoaToContractAddressCommitments.contains(convertToUint(msg.sender)) == false, "You already have a commitment. One at a time.");
         _;
 	}
-
+	
 	function newCommitment(uint8 goal, uint64 date, address payable recipient, uint amountToSave) validateParams(goal, date, recipient, amountToSave) external payable {
 			Commitment commitmentContract = new Commitment{value: msg.value}(goal, date, recipient, amountToSave); 
 			address commitmentAddress = address(commitmentContract);
@@ -31,7 +32,8 @@ contract CommitmentCore is KeeperCompatibleInterface {
 		bool upKeep = false;
 		address[50] memory payableAddresses;
 		uint[50] memory amountsStaked;
-		uint ownerFee;
+		address[50] memory contracts;
+		uint[50] memory ownerFees;
 		uint8 count = 0;
 		for (uint i = 0; i < eoaToContractAddressCommitments.length(); i++) {
 			(uint256 committer, address contractAddress) = eoaToContractAddressCommitments.at(i);			
@@ -44,29 +46,31 @@ contract CommitmentCore is KeeperCompatibleInterface {
 					payableAddresses[count] = commitment.getRecipient();
 					(uint recipientAmount, uint ownerAmount) = calculateOwnerSplit(contractAddress);
 					amountsStaked[count] = recipientAmount;
-					ownerFee = ownerFee.add(ownerAmount);
+					ownerFees[count] = ownerAmount;
 			}
+			contracts[count] = contractAddress;
 			upKeep = true;
 			++count;	
 		}
 				
 		}			
-		return (upKeep, abi.encode(payableAddresses, amountsStaked, ownerFee));
+		return (upKeep, abi.encode(payableAddresses, amountsStaked, contracts, ownerFees));
 	}
 
 
 	function performUpkeep(bytes calldata performData) external override {
-		(address[50] memory payableAddresses, uint[50] memory amountsStaked, uint ownerFee) = abi.decode(performData, (address[50], uint[50], uint));	
+
+		(address[50] memory payableAddresses, uint[50] memory amountsStaked, address[50] memory contracts, uint[50] memory ownerFees) = abi.decode(performData, (address[50], uint[50], address[50], uint[50]));	
+
 		for (uint8 i = 0; i < payableAddresses.length; i++) {
 			if (payableAddresses[i] == address(0)) {
 				break;
 			}	
-			console.log(amountsStaked[i]);
-			// This is failing when it goes to estimate the gas. is there something wrong with the wei thats being passed in?
-      		payable(payableAddresses[i]).transfer(amountsStaked[i]); 
+
+    Commitment(contracts[i]).executePayout(payable(payableAddresses[i]), amountsStaked[i]); 
+		if (ownerFees[i] > 0) {
+			Commitment(contracts[i]).executePayout(payable(0x8626f6940E2eb28930eFb4CeF49B2d1F2C9C1199), ownerFees[i]);
 		}
-		if (ownerFee > 0) {
-			payable(0x8626f6940E2eb28930eFb4CeF49B2d1F2C9C1199).transfer(ownerFee);
 		}
 	}
 	
