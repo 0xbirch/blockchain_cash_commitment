@@ -28,7 +28,7 @@ describe("CommittmentCore tests", function () {
 	it("Should validate that a commitment was set up", async () => {
 		await commitmentContract.newCommitment( 
 			Date.now(), 
-			"0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266", 
+			"0x3c44cdddb6a900fa2b585dd299e03d12fa4293bc", 
 			ethers.utils.parseEther("1"), 
 			{value: ethers.utils.parseEther("2")})
 		const events = await commitmentContract.queryFilter("CommitmentContractCreated")
@@ -38,7 +38,7 @@ describe("CommittmentCore tests", function () {
 	it("Should validate that the new commitment contract address is the same as the address listed in the mapping", async () => {
 		await commitmentContract.newCommitment( 
 			Date.now(), 
-			"0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266", 
+			"0x3c44cdddb6a900fa2b585dd299e03d12fa4293bc", 
 			ethers.utils.parseEther("1"), 
 			{value: ethers.utils.parseEther("2")})
 		const events = await commitmentContract.queryFilter("CommitmentContractCreated")
@@ -50,7 +50,7 @@ describe("CommittmentCore tests", function () {
         const goalDate = Math.round(date.setDate(date.getDate() + 1) / 1000)
 		await commitmentContract.newCommitment( 
 			goalDate,
-			"0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266", 
+			"0x3c44cdddb6a900fa2b585dd299e03d12fa4293bc", 
 			ethers.utils.parseEther("1"), 
 			{value: ethers.utils.parseEther("2")})
 		const data = "0x00";
@@ -63,7 +63,7 @@ describe("CommittmentCore tests", function () {
         const goalDate = Math.round(date.setDate(date.getDate() - 1) / 1000)
 		await commitmentContract.newCommitment( 
 			goalDate,
-			"0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266", 
+			"0x3c44cdddb6a900fa2b585dd299e03d12fa4293bc", 
 			ethers.utils.parseEther("1"), 
 			{value: ethers.utils.parseEther("2")})
 		const data = "0x00";
@@ -76,7 +76,7 @@ describe("CommittmentCore tests", function () {
         const goalDate = Math.round(date.setDate(date.getDate() - 1) / 1000)
 		await commitmentContract.newCommitment( 
 			goalDate,
-			"0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266", 
+			"0x3c44cdddb6a900fa2b585dd299e03d12fa4293bc", 
 			ethers.utils.parseEther("1"), 
 			{value: ethers.utils.parseEther("2")})
 		const tx = {
@@ -254,7 +254,7 @@ describe("CommittmentCore tests", function () {
 		assert(endingBalanceMainAccount.toString() === ethers.utils.parseEther("10000").add(expectedCut).add(expectedCut).toString())
 	})	
 
-	it.only("should only allow one commitmemt at a time per committer", async () => {
+	it("should only allow one commitmemt at a time per committer", async () => {
 		const date = new Date()
         const goalDate = Math.round(date.setDate(date.getDate() - 1) / 1000)
 		await commitmentContract.newCommitment( 
@@ -270,6 +270,20 @@ describe("CommittmentCore tests", function () {
 				{value: ethers.utils.parseEther("2")})
 		} catch(error) {
 				assert(error.message.includes("You already have a commitment."))
+		}
+	})	
+
+	it("should not allow the committer to be the recipient", async () => {
+		const date = new Date()
+    const goalDate = Math.round(date.setDate(date.getDate() - 1) / 1000)
+		try {
+		await commitmentContract.newCommitment( 
+			goalDate,
+			"0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266", 
+			ethers.utils.parseEther("1"), 
+			{value: ethers.utils.parseEther("2")})
+		} catch(error) {
+				assert(error.message.includes("if the money goes to you."))
 		}
 	})	
 })

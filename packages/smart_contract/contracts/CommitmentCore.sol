@@ -11,21 +11,22 @@ contract CommitmentCore is KeeperCompatibleInterface {
 	using EnumerableMap for EnumerableMap.UintToAddressMap;
 	using SafeMath for uint;
 	
-	event CommitmentContractCreated(address indexed owner, address contractAddress);
+	event CommitmentContractCreated(address indexed owner, address contractAddress, uint64 date, address recipient);
 
 	EnumerableMap.UintToAddressMap private eoaToContractAddressCommitments;
 
 	modifier validateParams(uint64 date, address payable recipient, uint amountToSave) {
 		require(recipient != address(0), "Come on now, we don't want to see your ETH burned. Recipient is set to the zero address");
+		require(recipient != msg.sender, "What's the point, you'll never actually have a financial commitment if the money goes to you.");
 		require(eoaToContractAddressCommitments.contains(convertToUint(msg.sender)) == false, "You already have a commitment. One at a time...for now");
-        _;
+    _;
 	}
 	
 	function newCommitment(uint64 date, address payable recipient, uint amountToSave) validateParams(date, recipient, amountToSave) external payable {
 			Commitment commitmentContract = new Commitment{value: msg.value}(date, recipient, msg.sender, amountToSave); 
 			address commitmentAddress = address(commitmentContract);
 			eoaToContractAddressCommitments.set(convertToUint(msg.sender), commitmentAddress);
-			emit CommitmentContractCreated(msg.sender, commitmentAddress);
+			emit CommitmentContractCreated(msg.sender, commitmentAddress, date, recipient);
 	}	
 	
 	function checkUpkeep(bytes calldata checkdata) external override view returns (bool, bytes memory) {

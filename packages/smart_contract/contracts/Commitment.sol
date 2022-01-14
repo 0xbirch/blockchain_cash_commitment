@@ -8,6 +8,8 @@ import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 contract Commitment is Ownable {
 	using SafeMath for uint;    
 
+		event CommitmentPayout(address indexed to, uint amount);
+
     struct SaveMoneyData {
         uint startingAmount;
         uint amountToSave;
@@ -43,5 +45,6 @@ contract Commitment is Ownable {
 
 	function executePayout(address payable to, uint amount) public onlyOwner {
 			to.transfer(amount);
+			emit CommitmentPayout(to, amount);
 	}	
 }
