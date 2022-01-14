@@ -15,7 +15,7 @@ describe("CommittmentCore tests", function () {
 
 	it("Should validate that the address is not the zero address", async () => {
 		try {
-		  await commitmentContract.newCommitment(0, 
+		  await commitmentContract.newCommitment(
 			Date.now(), 
 			"0x0000000000000000000000000000000000000000", 
 			ethers.utils.parseEther("1"), 
@@ -26,7 +26,7 @@ describe("CommittmentCore tests", function () {
 	})	
 
 	it("Should validate that a commitment was set up", async () => {
-		await commitmentContract.newCommitment(0, 
+		await commitmentContract.newCommitment( 
 			Date.now(), 
 			"0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266", 
 			ethers.utils.parseEther("1"), 
@@ -36,7 +36,7 @@ describe("CommittmentCore tests", function () {
 	})	
 
 	it("Should validate that the new commitment contract address is the same as the address listed in the mapping", async () => {
-		await commitmentContract.newCommitment(0, 
+		await commitmentContract.newCommitment( 
 			Date.now(), 
 			"0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266", 
 			ethers.utils.parseEther("1"), 
@@ -48,7 +48,7 @@ describe("CommittmentCore tests", function () {
 	it("Should validate that check up keep should return false if there are no commitments to execute", async () => {
 		const date = new Date()
         const goalDate = Math.round(date.setDate(date.getDate() + 1) / 1000)
-		await commitmentContract.newCommitment(0, 
+		await commitmentContract.newCommitment( 
 			goalDate,
 			"0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266", 
 			ethers.utils.parseEther("1"), 
@@ -61,7 +61,7 @@ describe("CommittmentCore tests", function () {
 	it("Should validate that check up keep should return true if there are commitments to execute", async () => {
 		const date = new Date()
         const goalDate = Math.round(date.setDate(date.getDate() - 1) / 1000)
-		await commitmentContract.newCommitment(0, 
+		await commitmentContract.newCommitment( 
 			goalDate,
 			"0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266", 
 			ethers.utils.parseEther("1"), 
@@ -74,7 +74,7 @@ describe("CommittmentCore tests", function () {
 	it("Should validate that check up keep should return the correct address list if there are commitments to execute", async () => {
 		const date = new Date()
         const goalDate = Math.round(date.setDate(date.getDate() - 1) / 1000)
-		await commitmentContract.newCommitment(0, 
+		await commitmentContract.newCommitment( 
 			goalDate,
 			"0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266", 
 			ethers.utils.parseEther("1"), 
@@ -96,7 +96,7 @@ describe("CommittmentCore tests", function () {
 		// This should only pass if the did accomplish method is returning true; 
 		const date = new Date()
         const goalDate = Math.round(date.setDate(date.getDate() - 1) / 1000)
-		await commitmentContract.newCommitment(0, 
+		await commitmentContract.newCommitment( 
 			goalDate,
 			"0x3c44cdddb6a900fa2b585dd299e03d12fa4293bc", 
 			ethers.utils.parseEther("1"), 
@@ -104,7 +104,7 @@ describe("CommittmentCore tests", function () {
 		const newSigner = commitmentContract.provider.getSigner("0x70997970c51812dc3a010c7d01b50e0d17dc79c8")
 		const newContract = commitmentContract.connect(newSigner)
         const goalDate2 = Math.round(date.setDate(date.getDate() - 1) / 1000)
-		await newContract.newCommitment(0, 
+		await newContract.newCommitment( 
 			goalDate2,
 			"0x3c44cdddb6a900fa2b585dd299e03d12fa4293bc", 
 			ethers.utils.parseEther("1"), 
@@ -133,7 +133,7 @@ describe("CommittmentCore tests", function () {
 		// This should only pass if the did accomplish method is returning false; 
 		const date = new Date()
         const goalDate = Math.round(date.setDate(date.getDate() - 1) / 1000)
-		await commitmentContract.newCommitment(0, 
+		await commitmentContract.newCommitment(
 			goalDate,
 			"0x70997970c51812dc3a010c7d01b50e0d17dc79c8", 
 			ethers.utils.parseEther("1"), 
@@ -142,7 +142,6 @@ describe("CommittmentCore tests", function () {
 		const returns = await commitmentContract.checkUpkeep(data)
 
 		const balance = ethers.utils.parseEther("2")  
-		console.log("balance", balance)
 		const cut = balance.mul(375).div(10000)
 		const expectedBytes = ethers.utils.defaultAbiCoder.encode(["uint", "uint"],[balance.sub(cut).toString(), cut.toString()])
 	 	assert(returns[1].includes("70997970c51812dc3a010c7d01b50e0d17dc79c8"))
@@ -154,7 +153,7 @@ describe("CommittmentCore tests", function () {
 	it("performUpkeep should pay the recipient and the fee when goal has failed", async () => {
 		const date = new Date()
         const goalDate = Math.round(date.setDate(date.getDate() - 1) / 1000)
-		await commitmentContract.newCommitment(0, 
+		await commitmentContract.newCommitment( 
 			goalDate,
 			"0x70997970c51812dc3a010c7d01b50e0d17dc79c8", 
 			ethers.utils.parseEther("1"), 
@@ -166,7 +165,6 @@ describe("CommittmentCore tests", function () {
 		const endingBalanceMainAccount = await ethers.provider.getBalance("0x8626f6940E2eb28930eFb4CeF49B2d1F2C9C1199")
 		const expectedCut = ethers.utils.parseEther("2").mul(ethers.utils.parseEther("375")).div(ethers.utils.parseEther("10000"))
 		const expectedValue = ethers.utils.parseEther("10000").add(ethers.utils.parseEther("2")).sub(expectedCut)
-		console.log("ending balance", endingBalance.toString(), "expexted balance", expectedValue.toString())
 		assert(endingBalance.toString() === expectedValue.toString())
 		assert(endingBalanceMainAccount.toString() === ethers.utils.parseEther("10000").add(expectedCut).toString())
 	})	
@@ -174,7 +172,7 @@ describe("CommittmentCore tests", function () {
 	it("performUpkeep should send the money back to the original owner when goal was accomplished", async () => {
 		const date = new Date()
         const goalDate = Math.round(date.setDate(date.getDate() - 1) / 1000)
-		await commitmentContract.newCommitment(0, 
+		await commitmentContract.newCommitment( 
 			goalDate,
 			"0x70997970c51812dc3a010c7d01b50e0d17dc79c8", 
 			ethers.utils.parseEther("1"), 
@@ -196,17 +194,16 @@ describe("CommittmentCore tests", function () {
 	})	
 
 	it("performUpkeep should pay the mulitiple addresses that needs to be paid", async () => {
-		// This tests needs to have didAccomplishGoal to return true 
 		const date = new Date()
         const goalDate = Math.round(date.setDate(date.getDate() - 1) / 1000)
-		await commitmentContract.newCommitment(0, 
+		await commitmentContract.newCommitment( 
 			goalDate,
 			"0x70997970c51812dc3a010c7d01b50e0d17dc79c8", 
 			ethers.utils.parseEther("1"), 
 			{value: ethers.utils.parseEther("2")})
 		const newSigner = commitmentContract.provider.getSigner("0x8626f6940E2eb28930eFb4CeF49B2d1F2C9C1199")
 		const newContract = commitmentContract.connect(newSigner)
-		await newContract.newCommitment(0, 
+		await newContract.newCommitment( 
 			goalDate,
 			"0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC", 
 			ethers.utils.parseEther("1"), 
@@ -232,17 +229,16 @@ describe("CommittmentCore tests", function () {
 	})	
 
 	it("performUpkeep should pay multiple recipients and the fee when goals has failed", async () => {
-		// This tests needs to have didAccomplishGoal to return false
 		const date = new Date()
         const goalDate = Math.round(date.setDate(date.getDate() - 1) / 1000)
-		await commitmentContract.newCommitment(0, 
+		await commitmentContract.newCommitment( 
 			goalDate,
 			"0x70997970c51812dc3a010c7d01b50e0d17dc79c8", 
 			ethers.utils.parseEther("1"), 
 			{value: ethers.utils.parseEther("2")})
 		const newSigner = commitmentContract.provider.getSigner("0x90F79bf6EB2c4f870365E785982E1f101E93b906")
 		const newContract = commitmentContract.connect(newSigner)
-		await newContract.newCommitment(0, 
+		await newContract.newCommitment( 
 			goalDate,
 			"0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC", 
 			ethers.utils.parseEther("1"), 
@@ -254,10 +250,26 @@ describe("CommittmentCore tests", function () {
 		const endingBalanceMainAccount = await ethers.provider.getBalance("0x8626f6940E2eb28930eFb4CeF49B2d1F2C9C1199")
 		const expectedCut = ethers.utils.parseEther("2").mul(ethers.utils.parseEther("375")).div(ethers.utils.parseEther("10000"))
 		const expectedValue = ethers.utils.parseEther("10000").add(ethers.utils.parseEther("2")).sub(expectedCut)
-		console.log("Ending balance of the first recipient", ethers.utils.formatEther(endingBalance.toString()))
 		assert(endingBalance.toString() === expectedValue.toString())
 		assert(endingBalanceMainAccount.toString() === ethers.utils.parseEther("10000").add(expectedCut).add(expectedCut).toString())
 	})	
 
-
+	it.only("should only allow one commitmemt at a time per committer", async () => {
+		const date = new Date()
+        const goalDate = Math.round(date.setDate(date.getDate() - 1) / 1000)
+		await commitmentContract.newCommitment( 
+			goalDate,
+			"0x70997970c51812dc3a010c7d01b50e0d17dc79c8", 
+			ethers.utils.parseEther("1"), 
+			{value: ethers.utils.parseEther("2")})
+		try {
+			await commitmentContract.newCommitment( 
+				goalDate,
+				"0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC", 
+				ethers.utils.parseEther("1"), 
+				{value: ethers.utils.parseEther("2")})
+		} catch(error) {
+				assert(error.message.includes("You already have a commitment."))
+		}
+	})	
 })
