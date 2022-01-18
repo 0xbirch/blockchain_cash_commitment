@@ -5,7 +5,6 @@ import "./Commitment.sol";
 import "@chainlink/contracts/src/v0.8/KeeperCompatible.sol";
 import "@openzeppelin/contracts/utils/structs/EnumerableMap.sol";
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
-import "hardhat/console.sol";
 
 contract CommitmentCore is KeeperCompatibleInterface {
 	using EnumerableMap for EnumerableMap.UintToAddressMap;
@@ -34,7 +33,7 @@ contract CommitmentCore is KeeperCompatibleInterface {
 		address[50] memory payableAddresses;
 		uint[50] memory amountsStaked;
 		address[50] memory contracts;
-		uint[50] memory ownerFees;
+		uint[50] memory ownerFees;	
 		uint8 count = 0;
 		for (uint i = 0; i < eoaToContractAddressCommitments.length(); i++) {
 			(uint256 committer, address contractAddress) = eoaToContractAddressCommitments.at(i);			
@@ -55,6 +54,13 @@ contract CommitmentCore is KeeperCompatibleInterface {
 		}
 				
 		}			
+	// Increase the performacne and reduce the pay here by trimming the arrays before sending them over the net
+	//	for (uint8 i = 0; i < payableAddresses.length; i++) {
+//			if (payableAddresses[i] == address(0)) {
+//				break;
+//			}
+//			trimmedPay
+//}	
 		return (upKeep, abi.encode(payableAddresses, amountsStaked, contracts, ownerFees));
 	}
 

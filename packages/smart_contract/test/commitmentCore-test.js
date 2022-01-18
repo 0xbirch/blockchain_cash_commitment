@@ -193,7 +193,7 @@ describe("CommittmentCore tests", function () {
 		assert(endingBalanceRecipient.toString() === expectedValue.toString())
 	})	
 
-	it("performUpkeep should pay the mulitiple addresses that needs to be paid", async () => {
+	it.only("performUpkeep should pay the mulitiple addresses that needs to be paid", async () => {
 		const date = new Date()
         const goalDate = Math.round(date.setDate(date.getDate() - 1) / 1000)
 		await commitmentContract.newCommitment( 

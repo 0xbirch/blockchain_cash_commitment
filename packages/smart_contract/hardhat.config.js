@@ -2,7 +2,7 @@ require("@nomiclabs/hardhat-waffle");
 require('dotenv').config()
 require("@nomiclabs/hardhat-etherscan");
 
-const {PRIVATE_KEY} = process.env
+const {PRIVATE_KEY, ALCH_API_KEY} = process.env
 
 // This is a sample Hardhat task. To learn how to create your own go to
 // https://hardhat.org/guides/create-task.html
@@ -31,7 +31,7 @@ module.exports = {
       }
     }
   },
-  defaultNetwork: "hardhat",
+  defaultNetwork: "localhost",
   networks: {
     localhost: {
       url: "http://localhost:8545",
@@ -43,6 +43,14 @@ module.exports = {
     mumbai: {
       url: "https://rpc-mumbai.maticvigil.com",
       accounts: [PRIVATE_KEY]
-    }
-  }
-};
+    },
+		ropsten: {
+			url: `https://eth-ropsten.alchemyapi.io/v2/${ALCH_API_KEY}`,
+			accounts: [`${PRIVATE_KEY}`]
+		}
+	},
+	etherscan: {
+		apiKey: `${ETHERSCAN_KEY}`
+}
+}
+
