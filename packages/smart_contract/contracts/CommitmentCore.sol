@@ -9,11 +9,11 @@ import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 contract CommitmentCore is KeeperCompatibleInterface {
 	using EnumerableMap for EnumerableMap.UintToAddressMap;
 	using SafeMath for uint;
-	
+	address owner;	
 	event CommitmentContractCreated(address indexed owner, address contractAddress, uint64 date, address recipient);
 
 	EnumerableMap.UintToAddressMap private eoaToContractAddressCommitments;
-
+		
 	modifier validateParams(uint64 date, address payable recipient, uint amountToSave) {
 		require(recipient != address(0), "Come on now, we don't want to see your ETH burned. Recipient is set to the zero address");
 		require(recipient != msg.sender, "What's the point, you'll never actually have a financial commitment if the money goes to you.");
@@ -21,6 +21,10 @@ contract CommitmentCore is KeeperCompatibleInterface {
     _;
 	}
 	
+	constructor() {
+		owner = msg.sender;
+	}
+
 	function newCommitment(uint64 date, address payable recipient, uint amountToSave) validateParams(date, recipient, amountToSave) external payable {
 			Commitment commitmentContract = new Commitment{value: msg.value}(date, recipient, msg.sender, amountToSave); 
 			address commitmentAddress = address(commitmentContract);
@@ -76,7 +80,7 @@ contract CommitmentCore is KeeperCompatibleInterface {
 
     Commitment(contracts[i]).executePayout(payable(payableAddresses[i]), amountsStaked[i]); 
 		if (ownerFees[i] > 0) {
-			Commitment(contracts[i]).executePayout(payable(0x8626f6940E2eb28930eFb4CeF49B2d1F2C9C1199), ownerFees[i]);
+			Commitment(contracts[i]).executePayout(payable(owner), ownerFees[i]);
 		}
 		}
 	}
@@ -94,6 +98,11 @@ contract CommitmentCore is KeeperCompatibleInterface {
 		uint ownerAmount = balance.mul(375).div(10000);
 		return (balance.sub(ownerAmount), ownerAmount);
 	 }
+	
+	function setOwner(address ownerAddress) external {
+		require(msg.sender == owner);	
+		owner = ownerAddress;
+	}
 
 	receive() external payable {}
 }

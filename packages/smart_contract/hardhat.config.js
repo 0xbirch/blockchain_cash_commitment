@@ -2,7 +2,7 @@ require("@nomiclabs/hardhat-waffle");
 require('dotenv').config()
 require("@nomiclabs/hardhat-etherscan");
 
-const {PRIVATE_KEY, ALCH_API_KEY} = process.env
+const {PRIVATE_KEY, ALCH_API_KEY, ETHERSCAN_KEY} = process.env
 
 // This is a sample Hardhat task. To learn how to create your own go to
 // https://hardhat.org/guides/create-task.html
@@ -31,7 +31,7 @@ module.exports = {
       }
     }
   },
-  defaultNetwork: "localhost",
+  defaultNetwork: "hardhat",
   networks: {
     localhost: {
       url: "http://localhost:8545",
