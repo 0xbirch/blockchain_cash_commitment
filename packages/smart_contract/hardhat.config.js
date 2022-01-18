@@ -1,7 +1,8 @@
 require("@nomiclabs/hardhat-waffle");
 require('dotenv').config()
+require("@nomiclabs/hardhat-etherscan");
 
-const {PRIVATE_KEY} = process.env
+const {PRIVATE_KEY, ALCH_API_KEY, ETHERSCAN_KEY} = process.env
 
 // This is a sample Hardhat task. To learn how to create your own go to
 // https://hardhat.org/guides/create-task.html
@@ -20,9 +21,9 @@ task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
 module.exports = {
   solidity: {
     version: "0.8.4",
-	paths: {
-    	artifacts: './src/artifacts',
-  	},
+//	paths: {
+//    	artifacts: '../dapp/src/artifacts',
+//  	},
     settings: {
       optimizer: {
         enabled: true,
@@ -30,7 +31,7 @@ module.exports = {
       }
     }
   },
-  defaultNetwork: "localhost",
+  defaultNetwork: "hardhat",
   networks: {
     localhost: {
       url: "http://localhost:8545",
@@ -42,6 +43,14 @@ module.exports = {
     mumbai: {
       url: "https://rpc-mumbai.maticvigil.com",
       accounts: [PRIVATE_KEY]
-    }
-  }
-};
+    },
+		ropsten: {
+			url: `https://eth-ropsten.alchemyapi.io/v2/${ALCH_API_KEY}`,
+			accounts: [`${PRIVATE_KEY}`]
+		}
+	},
+	etherscan: {
+		apiKey: `${ETHERSCAN_KEY}`
+}
+}
+

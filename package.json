@@ -33,6 +33,7 @@
     ]
   },
   "devDependencies": {
-    "ethers": "^5.4.1"
+    "ethers": "^5.4.1",
+    "chai": "^4.3.4"
   }
 }

@@ -4,7 +4,6 @@
   "private": true,
   "dependencies": {
     "@chakra-ui/react": "^1.7.3",
-    "@openzeppelin/contracts": "^4.4.0",
     "@testing-library/jest-dom": "^5.14.1",
     "@testing-library/react": "^11.2.7",
     "@testing-library/user-event": "^12.8.3",
@@ -44,7 +43,6 @@
     ]
   },
   "devDependencies": {
-    "@types/react-datepicker": "^4.1.7",
-    "chai": "^4.3.4"
+    "@types/react-datepicker": "^4.1.7"
   }
 }

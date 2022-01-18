@@ -108,6 +108,7 @@ export default function CommitementForm(props: any) {
                     <FormLabel pt={10} htmlFor="recipient" color="white">Who do you want your stake to go to if you don't meet your goal?</FormLabel>
                     <RadioGroup onChange={setRecipient} value={recipient}>
                         <Stack>
+		// Git coin grants matching pool?
                             <Radio {...register("recipient")} value="0" colorScheme="white"><Text color="white">Test Account 1</Text></Radio>
                             <Radio {...register("recipient")} value="1" color="white"><Text color="white">Test Account 2</Text></Radio>
                             <Radio {...register("recipient")} value="2" color="white"><Text color="white">Test Account 3</Text></Radio>
